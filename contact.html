@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bloomie — Connect with Nature & Companions</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">
+        <img src="Asset/logo_vectorized.svg" alt="Bloomie AI Logo"> Bloomie AI
+      </a>
+
+      <!-- Mobile Menu Button -->
+      <button id="menuToggle" class="menu-toggle">☰</button>
+
+      <!-- Navigation -->
+      <nav id="navbar" class="nav">
+        <a href="index.html">Home</a>
+        <a href="blog.html">Blog</a>
+        <a href="features.html">Features</a>
+        <a href="about.html">About</a>
+        <a href="contact.html" class="active">Contact</a>
+        <a class="btn primary" href="download.html">Download App</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contact Section -->
+  <section class="section">
+    <div class="container">
+      <h2>Contact Us</h2>
+      <p class="lead">Have questions or want to partner? Reach us.</p>
+      <form class="contact-form" onsubmit="event.preventDefault(); alert('Thanks — form simulated (no backend)')">
+        <label>Name
+          <input required placeholder="Your name" />
+        </label>
+        <label>Email
+          <input required placeholder="you@domain.com" type="email" />
+        </label>
+        <label>Message
+          <textarea rows="4" required placeholder="How can we help?"></textarea>
+        </label>
+        <div style="margin-top:10px">
+          <button class="btn primary" type="submit">Send Message</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="brand">
+        <div class="logo">
+          <img src="Asset/logo_vectorized.svg" alt="Bloomie AI Logo"> Bloomie AI
+        </div>
+        <p>Connecting People With Nature — One App for Plant & Pet Lovers</p>
+      </div>
+      <div class="social">
+        <p>Email us: <a href="mailto:app.bloomiee@gmail.com">app.bloomiee@gmail.com</a></p>
+        <div class="copy">© 2025 Bloomie. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS for mobile menu -->
+  <script>
+    const menuToggle = document.getElementById("menuToggle");
+    const navbar = document.getElementById("navbar");
+
+    menuToggle.addEventListener("click", () => {
+      navbar.classList.toggle("open");
+      menuToggle.classList.toggle("active");
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener("click", function(e) {
+      if (!navbar.contains(e.target) && !menuToggle.contains(e.target)) {
+        navbar.classList.remove("open");
+        menuToggle.classList.remove("active");
+      }
+    });
+
+    // Close menu on link click (mobile)
+    const navLinks = navbar.querySelectorAll("a");
+    navLinks.forEach(link => {
+      link.addEventListener("click", () => {
+        navbar.classList.remove("open");
+        menuToggle.classList.remove("active");
+      });
+    });
+  </script>
+
+</body>
+</html>

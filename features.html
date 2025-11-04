@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bloomie Features — Smart Tools for Nature Lovers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html">
+      <img src="Asset/logo_vectorized.svg" alt=""> Bloomie AI
+    </a>
+
+    <!-- Mobile Menu Button -->
+    <button id="menuToggle" class="menu-toggle">☰</button>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="nav">
+      <a href="index.html">Home</a>
+      <a href="blog.html">Blog</a>
+      <a href="features.html" class="active">Features</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+
+    <a class="btn primary" href="download.html">Download App</a>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main>
+
+  <!-- Hero -->
+  <section class="hero fade-up">
+    <div class="container">
+      <h1>Discover Bloomie’s Smart Features</h1>
+      <p>From AI-powered plant identification to community-driven learning — Bloomie makes caring for your plants and pets effortless and fun.</p>
+      <img src="https://static.wixstatic.com/media/a89370_c20797d9916c422091929f949084e8eb~mv2.png" alt="Bloomie app showcase" class="hero-image">
+    </div>
+  </section>
+
+  <!-- Core Features -->
+  <section class="core fade-up">
+    <div class="container">
+      <div class="core-header">
+        <h2>Core Features</h2>
+        <p>Everything you need to keep your plants and pets healthy and thriving.</p>
+      </div>
+      <div class="core-grid">
+        <div class="feature-card">
+          <img src="https://static.wixstatic.com/media/a89370_360cfbd049fd4b37b55c810263c6c03f~mv2.png" alt="Smart Search">
+          <h3>Smart Search & Discovery</h3>
+          <p>Instantly identify plants and pets with AI and explore personalized recommendations.</p>
+          <ul>
+            <li>AI-powered identification</li>
+            <li>Breed recognition</li>
+            <li>Voice search</li>
+            <li>Smart filtering</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <img src="https://static.wixstatic.com/media/a89370_d4c8ba46e923401abe4e4f0287ec6c47~mv2.png" alt="Care Guides">
+          <h3>Comprehensive Care Guides</h3>
+          <p>Tailored care tips, reminders, and schedules for your unique plant or pet.</p>
+          <ul>
+            <li>Personalized schedules</li>
+            <li>Water & feeding reminders</li>
+            <li>Seasonal tips</li>
+            <li>Expert advice</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <img src="https://static.wixstatic.com/media/a89370_d626948393fe480a9d93bc2711b65f61~mv2.png" alt="Community Feed">
+          <h3>Vibrant Community Feed</h3>
+          <p>Connect with other plant and pet lovers to share insights, photos, and inspiration.</p>
+          <ul>
+            <li>Photo sharing</li>
+            <li>Q&A with experts</li>
+            <li>Local meetups</li>
+            <li>Community events</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Additional Features -->
+  <section class="additional fade-up">
+    <div class="container">
+      <div class="additional-header">
+        <h2>More to Explore</h2>
+        <p>Enhance your experience with these extra smart features designed just for you.</p>
+      </div>
+      <div class="additional-grid">
+        <div class="add-card">
+          <div class="add-icon">📷</div>
+          <h3>Plant & Pet ID</h3>
+          <p>Scan any plant or pet for instant AI-based identification.</p>
+        </div>
+        <div class="add-card">
+          <div class="add-icon">🩺</div>
+          <h3>Health Diagnosis</h3>
+          <p>Detect issues early with our smart diagnostic tool.</p>
+        </div>
+        <div class="add-card">
+          <div class="add-icon">🔔</div>
+          <h3>Smart Reminders</h3>
+          <p>Get notifications for watering, feeding, and vet visits.</p>
+        </div>
+        <div class="add-card">
+          <div class="add-icon">💬</div>
+          <h3>Expert Chat</h3>
+          <p>Chat directly with certified experts for personalized advice.</p>
+        </div>
+        <div class="add-card">
+          <div class="add-icon">⭐</div>
+          <h3>Progress Tracking</h3>
+          <p>Monitor growth and milestones with beautiful analytics.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta fade-up">
+    <div class="container">
+      <h2>Ready to Experience Bloomie?</h2>
+      <p>Join thousands of nature lovers using Bloomie to care for their plants and pets every day.</p>
+      <div class="cta-buttons">
+        <a href="#" class="btn">Download for iOS</a>
+        <a href="#" class="btn btn-outline">Download for Android</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <div class="logo"><img src="Asset/logo_vectorized.svg" alt=""> Bloomie AI</div>
+      <p>Connecting People With Nature — One App for Plant & Pet Lovers</p>
+    </div>
+    <div class="social">
+      <p>Email us: <a href="mailto:app.bloomiee@gmail.com">app.bloomiee@gmail.com</a></p>
+      <div class="copy">© 2025 Bloomie. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<!-- Scroll Animation -->
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add("visible");
+  });
+},{ threshold: 0.2 });
+document.querySelectorAll(".fade-up").forEach(el => observer.observe(el));
+
+// Mobile Menu Toggle
+const menuToggle = document.getElementById("menuToggle");
+const navbar = document.getElementById("navbar");
+
+menuToggle.addEventListener("click", () => {
+  navbar.classList.toggle("open");
+  menuToggle.classList.toggle("active");
+});
+</script>
+
+</body>
+</html>

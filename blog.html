@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bloomie Blog — Insights & Community Stories</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html">
+      <img src="Asset/logo_vectorized.svg" alt="Bloomie AI Logo"> Bloomie AI
+    </a>
+
+    <!-- Mobile Menu Button -->
+    <button id="menuToggle" class="menu-toggle">☰</button>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="nav">
+      <a href="index.html">Home</a>
+      <a href="blog.html" class="active">Blog</a>
+      <a href="features.html">Features</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a class="btn primary" href="download.html">Download App</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main>
+  <!-- Hero -->
+  <section class="blog-hero fade-in">
+    <div class="container text-center">
+      <h1>Bloomie Blog</h1>
+      <p>Discover expert insights, community stories, and the latest tips for caring for your plants and pets.</p>
+      <div class="search-bar">
+        <input type="text" placeholder="Search articles..." />
+        <button class="btn primary">Search</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Article -->
+  <section class="featured-article fade-in">
+    <div class="container">
+      <h2>Featured Article</h2>
+      <div class="featured-card">
+        <div class="featured-img">
+          <img src="https://static.wixstatic.com/media/a89370_b73d34ef941f449cbe3b7e2be2a9f4f3~mv2.png" alt="Featured Article">
+        </div>
+        <div class="featured-content">
+          <span class="tag">Plant Care</span>
+          <h3>10 Ways to Revive a Dying Houseplant</h3>
+          <p>Learn simple but effective methods to bring your beloved plant back to life and keep it thriving for years to come.</p>
+          <div class="meta">
+            <span>By Bloomie Team</span> • <span>Oct 20, 2025</span>
+          </div>
+          <a href="#" class="btn primary">Read Article →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Articles -->
+  <section class="recent-articles fade-in">
+    <div class="container grid">
+      <div class="articles-list">
+        <h2>Recent Articles</h2>
+        <div class="articles-grid">
+          <div class="article-card">
+            <img src="https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png" alt="Article">
+            <div class="article-content">
+              <div class="tags">
+                <span class="tag">Pet Health</span>
+                <span class="tag">Care</span>
+              </div>
+              <h3>Understanding Your Pet’s Body Language</h3>
+              <p>Recognize subtle signs your pets use to communicate and strengthen your bond with them.</p>
+              <div class="meta">
+                <span>Bloomie Team</span> • <span>Oct 15, 2025</span>
+              </div>
+              <a href="#" class="read-more">Read More →</a>
+            </div>
+          </div>
+
+          <div class="article-card">
+            <img src="https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png" alt="Article">
+            <div class="article-content">
+              <div class="tags">
+                <span class="tag">Plant Care</span>
+                <span class="tag">Tips</span>
+              </div>
+              <h3>Choosing the Perfect Indoor Plant</h3>
+              <p>Explore easy-care plants ideal for beginners and how to help them flourish indoors.</p>
+              <div class="meta">
+                <span>Bloomie Team</span> • <span>Oct 10, 2025</span>
+              </div>
+              <a href="#" class="read-more">Read More →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-box">
+          <h3>Categories</h3>
+          <ul>
+            <li><a href="#">Plant Care <span>12</span></a></li>
+            <li><a href="#">Pet Health <span>8</span></a></li>
+            <li><a href="#">Community Stories <span>15</span></a></li>
+            <li><a href="#">Expert Tips <span>6</span></a></li>
+            <li><a href="#">App Updates <span>4</span></a></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-box subscribe-box">
+          <h3>Stay Updated</h3>
+          <p>Get the latest plant and pet care tips delivered to your inbox.</p>
+          <input type="email" placeholder="Your email address">
+          <button class="btn white">Subscribe</button>
+        </div>
+
+        <div class="sidebar-box">
+          <h3>Popular Tags</h3>
+          <div class="tags-list">
+            <a href="#">Plant Care</a>
+            <a href="#">Pet Health</a>
+            <a href="#">Indoor Plants</a>
+            <a href="#">Dog Training</a>
+            <a href="#">Gardening</a>
+            <a href="#">Pet Nutrition</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="blog-cta fade-in">
+    <div class="container text-center">
+      <h2>Join Our Community</h2>
+      <p>Get personalized care advice, connect with fellow enthusiasts, and access exclusive content in the Bloomie app.</p>
+      <div class="cta-buttons">
+        <a href="download.html" class="btn primary">Download Bloomie</a>
+        <a href="#" class="btn outline">Join Newsletter</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">
+      <div class="logo"><img src="Asset/logo_vectorized.svg" alt="Bloomie AI Logo"> Bloomie AI</div>
+      <p>Connecting People With Nature — One App for Plant & Pet Lovers</p>
+    </div>
+    <div class="social">
+      <p>Email us: <a href="mailto:app.bloomiee@gmail.com">app.bloomiee@gmail.com</a></p>
+      <div class="copy">© 2025 Bloomie. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<!-- JS for mobile menu -->
+<script>
+  const menuToggle = document.getElementById('menuToggle');
+  const navbar = document.getElementById('navbar');
+
+  menuToggle.addEventListener('click', () => {
+    navbar.classList.toggle('open');
+    menuToggle.classList.toggle('open');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!navbar.contains(e.target) && !menuToggle.contains(e.target)) {
+      navbar.classList.remove('open');
+      menuToggle.classList.remove('open');
+    }
+  });
+
+  // Close menu when clicking on a link (mobile)
+  const navLinks = navbar.querySelectorAll('a');
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      navbar.classList.remove('open');
+      menuToggle.classList.remove('open');
+    });
+  });
+</script>
+
+</body>
+</html>

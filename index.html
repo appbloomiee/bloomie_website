@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bloomie — Connect with Nature & Companions</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html">
+      <img src="Asset/logo_vectorized.svg" alt=""> Bloomie AI
+    </a>
+
+    <!-- Mobile Menu Button -->
+    <button id="menuToggle" class="menu-toggle">☰</button>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="blog.html">Blog</a>
+      <a href="features.html">Features</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+
+    <a class="btn primary" href="download.html">Download App</a>
+  </div>
+</header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-text">
+      <h1>Connect with Nature,<br>Care for Companions 🌸</h1>
+      <p>Bloomie is the perfect app for plant and pet lovers. Track your garden, nurture your pets, and discover a community that grows together.</p>
+      <div class="controls">
+        <a href="download.html" class="btn primary">Get Started</a>
+        <a href="features.html" class="btn secondary">Learn More</a>
+      </div>
+    </div>
+
+    <div class="app-carousel">
+      <div class="app-carousel-inner">
+        <img src="Asset/SPLASH.png" alt="Splash Screen">
+        <img src="Asset/Home.png" alt="App Screenshot 1">
+        <img src="Asset/Login.png" alt="App Screenshot 2">
+        <img src="Asset/Plantcare.png" alt="App Screenshot 3">
+        <img src="Asset/Post.png" alt="App Screenshot 4">
+        <img src="Asset/Shop.png" alt="App Screenshot 5">
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Bloomie Section -->
+  <section id="features" class="features-section">
+    <div class="container">
+      <h2>Why Choose Bloomie?</h2>
+      <p class="intro-text">
+        Because caring for your plants and pets should be simple, smart, and joyful — not stressful.
+        Bloomie brings nature and companionship together in one easy app that helps you track, share, and grow every day.
+      </p>
+      <div class="features-list">
+        <div class="feature-item">
+          <h3>🌱 Grow Together</h3>
+          <p>Bloomie connects you with people who share your love for green life. Exchange tips, learn from others, and celebrate your progress.</p>
+        </div>
+        <div class="feature-item">
+          <h3>🐾 One App for All</h3>
+          <p>Manage your plant watering schedules and pet care routines in one place. Everything stays organized and easy to track.</p>
+        </div>
+        <div class="feature-item">
+          <h3>🌸 A Peaceful Experience</h3>
+          <p>Clean design, relaxing visuals, and simple tools that make caring for life feel peaceful. Users say “this is such a good idea!” — and we agree.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="brand">
+        <div class="logo">
+          <img src="Asset/logo_vectorized.svg" alt="Bloomie Logo"> Bloomie AI
+        </div>
+        <p>Connecting People With Nature — One App for Plant & Pet Lovers</p>
+      </div>
+      <div class="social">
+        <p>Email us: <a href="mailto:app.bloomiee@gmail.com">app.bloomiee@gmail.com</a></p>
+        <div class="copy">© 2025 Bloomie. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ✅ Script -->
+  <script>
+    // Mobile menu toggle logic
+    const menuToggle = document.getElementById('menuToggle');
+    const navbar = document.getElementById('navbar');
+
+    menuToggle.addEventListener('click', () => {
+      navbar.classList.toggle('open');
+    });
+  </script>
+</body>
+</html>

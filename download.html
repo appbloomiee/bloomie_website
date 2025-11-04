@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bloomie — Connect with Nature & Companions</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Header -->
+ <header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html">
+      <img src="Asset/logo_vectorized.svg" alt=""> Bloomie AI
+    </a>
+
+    <!-- Mobile Menu Button -->
+    <button id="menuToggle" class="menu-toggle">☰</button>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="nav">
+      <a href="index.html">Home</a>
+      <a href="blog.html">Blog</a>
+      <a href="features.html">Features</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+
+    <a class="btn primary" href="download.html">Download App</a>
+  </div>
+</header>
+
+  <!-- Download Section -->
+  <section class="section fade-up">
+    <div class="container">
+      <h2>Download Bloomie</h2>
+      <p>Available on Google Play and the App Store. Use the QR code to download to your phone.</p>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+        <div class="card"><strong>Google Play</strong><p>Coming Soon</p></div>
+        <div class="card"><strong>App Store</strong><p>Coming Soon</p></div>
+        <div class="card"><strong>QR Code</strong><p>[QR placeholder]</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="brand">
+        <div class="logo"><img src="Asset/logo_vectorized.svg" alt=""> Bloomie AI</div>
+        <p>Connecting People With Nature — One App for Plant & Pet Lovers</p>
+      </div>
+      <div class="social">
+        <p>Email us: <a href="mailto:app.bloomiee@gmail.com">app.bloomiee@gmail.com</a></p>
+        <div class="copy">© 2025 Bloomie. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script -->
+  <script>
+    // Mobile menu toggle
+    const menuToggle = document.getElementById("menuToggle");
+    const navbar = document.getElementById("navbar");
+
+    menuToggle.addEventListener("click", () => {
+      navbar.classList.toggle("open");
+      menuToggle.classList.toggle("active");
+    });
+
+    // Optional scroll fade-in animation
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add("visible");
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll(".fade-up").forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
