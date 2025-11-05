@@ -1152,6 +1152,13 @@ section {
   /* Mobile Navigation */
   .menu-toggle {
     display: block;
+    order: 2;
+  }
+
+  .header-inner .btn.primary {
+    order: 1;
+    margin-left: auto;
+    margin-right: 15px;
   }
 
   .nav {
@@ -1181,10 +1188,6 @@ section {
     text-align: center;
     padding: 12px;
     border-radius: 12px;
-  }
-
-  .header-inner .btn.primary {
-    display: none;
   }
 
   /* Hero Section */
@@ -1368,4 +1371,3 @@ section {
     padding: 25px 15px;
   }
 }
-  
