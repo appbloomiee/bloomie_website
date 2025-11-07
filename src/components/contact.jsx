@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X, Send, Mail, User, MessageSquare } from 'lucide-react';
 
 export default function BloomieContact() {
@@ -137,26 +137,7 @@ export default function BloomieContact() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="text-center md:text-left">
-              <div className="flex items-center gap-2 text-2xl font-bold mb-3 justify-center md:justify-start">
-                <span className="text-3xl"><img src="/Asset/logo.svg" alt="" /></span>
-                <span>Bloomie AI</span>
-              </div>
-              <p className="text-gray-400">Connecting People With Nature — One App for Plant & Pet Lovers</p>
-            </div>
-            <div className="text-center md:text-right">
-              <p className="text-gray-400 mb-2">
-                Email us: <a href="mailto:app.bloomiee@gmail.com" className="text-emerald-400 hover:text-emerald-300">app.bloomiee@gmail.com</a>
-              </p>
-              <p className="text-gray-500 text-sm">© 2025 Bloomie. All rights reserved.</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      
     </div>
   );
 }

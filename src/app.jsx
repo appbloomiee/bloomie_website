@@ -6,6 +6,7 @@ import Contact from './components/contact'
 import Features from './components/feature'
 import Nav from './components/nav'
 import Footer from './components/footer'
+import ChatWidget from './components/chat_widget'  // Add this import
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/feature" element={<Features />} />
       </Routes>
       <Footer/>
+      <ChatWidget />  {/* Add this line */}
     </BrowserRouter>
   )
 }
