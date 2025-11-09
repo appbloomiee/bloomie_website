@@ -1,56 +1,227 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
-import { Menu, X, Search, ArrowRight, Mail } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Menu, X, Search, ArrowRight, Mail, Loader2 } from 'lucide-react';
+
+const API_BASE_URL = 'http://107.167.94.243:5000/api';
 
 export default function BloomeBlog() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [email, setEmail] = useState('');
+  
+  // State for API data
+  const [articles, setArticles] = useState([]);
+  const [featuredArticle, setFeaturedArticle] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [popularTags, setPopularTags] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [subscribeStatus, setSubscribeStatus] = useState('');
 
-  const articles = [
-    {
-      id: 1,
-      image: 'https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png',
-      tags: ['Pet Health', 'Care'],
-      title: "Understanding Your Pet's Body Language",
-      excerpt: "Recognize subtle signs your pets use to communicate and strengthen your bond with them.",
-      author: "Bloomie Team",
-      date: "Oct 15, 2025"
-    },
-    {
-      id: 2,
-      image: 'https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png',
-      tags: ['Plant Care', 'Tips'],
-      title: "Choosing the Perfect Indoor Plant",
-      excerpt: "Explore easy-care plants ideal for beginners and how to help them flourish indoors.",
-      author: "Bloomie Team",
-      date: "Oct 10, 2025"
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchBlogData();
+  }, []);
+
+  const fetchBlogData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch recent blogs
+      const recentResponse = await fetch(`${API_BASE_URL}/blogs/recent`);
+      if (!recentResponse.ok) throw new Error('Failed to fetch recent blogs');
+      const recentData = await recentResponse.json();
+      
+      // Fetch popular blogs for featured
+      const popularResponse = await fetch(`${API_BASE_URL}/blogs/popular`);
+      if (!popularResponse.ok) throw new Error('Failed to fetch popular blogs');
+      const popularData = await popularResponse.json();
+      
+      // Fetch categories
+      const categoriesResponse = await fetch(`${API_BASE_URL}/categories`);
+      if (!categoriesResponse.ok) throw new Error('Failed to fetch categories');
+      const categoriesData = await categoriesResponse.json();
+
+      // Safely extract arrays from API responses
+      let recentBlogs = [];
+      if (recentData) {
+        if (Array.isArray(recentData)) {
+          recentBlogs = recentData;
+        } else if (recentData.blogs && Array.isArray(recentData.blogs)) {
+          recentBlogs = recentData.blogs;
+        } else if (recentData.data && Array.isArray(recentData.data)) {
+          recentBlogs = recentData.data;
+        }
+      }
+
+      let popularBlogs = [];
+      if (popularData) {
+        if (Array.isArray(popularData)) {
+          popularBlogs = popularData;
+        } else if (popularData.blogs && Array.isArray(popularData.blogs)) {
+          popularBlogs = popularData.blogs;
+        } else if (popularData.data && Array.isArray(popularData.data)) {
+          popularBlogs = popularData.data;
+        }
+      }
+
+      let categoriesList = [];
+      if (categoriesData) {
+        if (Array.isArray(categoriesData)) {
+          categoriesList = categoriesData;
+        } else if (categoriesData.categories && Array.isArray(categoriesData.categories)) {
+          categoriesList = categoriesData.categories;
+        } else if (categoriesData.data && Array.isArray(categoriesData.data)) {
+          categoriesList = categoriesData.data;
+        }
+      }
+
+      // Set the data
+      setArticles(recentBlogs);
+      setFeaturedArticle(popularBlogs[0] || null);
+      setCategories(categoriesList);
+      
+      // Extract unique tags from articles
+      const allBlogs = [...recentBlogs, ...popularBlogs];
+      const allTags = allBlogs
+        .filter(blog => blog && blog.tags && Array.isArray(blog.tags))
+        .flatMap(blog => blog.tags)
+        .filter((tag, index, self) => self.indexOf(tag) === index)
+        .slice(0, 6);
+      setPopularTags(allTags);
+
+    } catch (err) {
+      console.error('Error fetching blog data:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-  ];
-
-  const categories = [
-    { name: 'Plant Care', count: 12 },
-    { name: 'Pet Health', count: 8 },
-    { name: 'Community Stories', count: 15 },
-    { name: 'Expert Tips', count: 6 },
-    { name: 'App Updates', count: 4 }
-  ];
-
-  const popularTags = [
-    'Plant Care', 'Pet Health', 'Indoor Plants', 
-    'Dog Training', 'Gardening', 'Pet Nutrition'
-  ];
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery);
+    if (!searchQuery.trim()) return;
+
+    fetch(`${API_BASE_URL}/blogs/search?q=${encodeURIComponent(searchQuery)}`)
+      .then(response => {
+        if (!response.ok) throw new Error('Search failed');
+        return response.json();
+      })
+      .then(data => {
+        let searchResults = [];
+        if (data) {
+          if (Array.isArray(data)) {
+            searchResults = data;
+          } else if (data.blogs && Array.isArray(data.blogs)) {
+            searchResults = data.blogs;
+          } else if (data.data && Array.isArray(data.data)) {
+            searchResults = data.data;
+          }
+        }
+        setArticles(searchResults);
+      })
+      .catch(err => {
+        console.error('Search error:', err);
+        setError('Search failed. Please try again.');
+      });
   };
 
   const handleSubscribe = (e) => {
     e.preventDefault();
+    if (!email.trim()) return;
     console.log('Subscribing:', email);
+    setSubscribeStatus('success');
     setEmail('');
+    setTimeout(() => setSubscribeStatus(''), 3000);
   };
+
+  const handleCategoryClick = (categoryName) => {
+    fetch(`${API_BASE_URL}/blogs/category/${encodeURIComponent(categoryName)}`)
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch category blogs');
+        return response.json();
+      })
+      .then(data => {
+        let categoryResults = [];
+        if (data) {
+          if (Array.isArray(data)) {
+            categoryResults = data;
+          } else if (data.blogs && Array.isArray(data.blogs)) {
+            categoryResults = data.blogs;
+          } else if (data.data && Array.isArray(data.data)) {
+            categoryResults = data.data;
+          }
+        }
+        setArticles(categoryResults);
+      })
+      .catch(err => {
+        console.error('Category filter error:', err);
+      });
+  };
+
+  const handleTagClick = (tag) => {
+    fetch(`${API_BASE_URL}/blogs/tag/${encodeURIComponent(tag)}`)
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch tag blogs');
+        return response.json();
+      })
+      .then(data => {
+        let tagResults = [];
+        if (data) {
+          if (Array.isArray(data)) {
+            tagResults = data;
+          } else if (data.blogs && Array.isArray(data.blogs)) {
+            tagResults = data.blogs;
+          } else if (data.data && Array.isArray(data.data)) {
+            tagResults = data.data;
+          }
+        }
+        setArticles(tagResults);
+      })
+      .catch(err => {
+        console.error('Tag filter error:', err);
+      });
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return 'https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png';
+    if (imagePath.startsWith('http')) return imagePath;
+    return `http://107.167.94.243:5000${imagePath}`;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-emerald-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading blog posts...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error: {error}</p>
+          <button 
+            onClick={fetchBlogData}
+            className="bg-emerald-600 text-white px-6 py-2 rounded-full hover:bg-emerald-700 transition"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
@@ -87,42 +258,47 @@ export default function BloomeBlog() {
       </section>
 
       {/* Featured Article */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Featured Article</h2>
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition">
-            <div className="grid lg:grid-cols-2 gap-8">
-              <div className="relative h-64 lg:h-auto">
-                <img 
-                  src="https://static.wixstatic.com/media/a89370_b73d34ef941f449cbe3b7e2be2a9f4f3~mv2.png"
-                  alt="Featured Article"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-8 lg:p-12 flex flex-col justify-center">
-                <span className="inline-block bg-emerald-600 text-white px-4 py-1 rounded-full text-sm font-medium mb-4 w-fit">
-                  Plant Care
-                </span>
-                <h3 className="text-3xl font-bold text-gray-900 mb-4">
-                  10 Ways to Revive a Dying Houseplant
-                </h3>
-                <p className="text-gray-600 mb-6 text-lg">
-                  Learn simple but effective methods to bring your beloved plant back to life and keep it thriving for years to come.
-                </p>
-                <div className="flex items-center text-gray-500 text-sm mb-6">
-                  <span>By Bloomie Team</span>
-                  <span className="mx-2">•</span>
-                  <span>Oct 20, 2025</span>
+      {featuredArticle && (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">Featured Article</h2>
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition">
+              <div className="grid lg:grid-cols-2 gap-8">
+                <div className="relative h-64 lg:h-auto">
+                  <img 
+                    src={getImageUrl(featuredArticle.featuredImage || featuredArticle.image)}
+                    alt={featuredArticle.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <a href="#" className="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-full font-medium hover:bg-emerald-700 transition w-fit group">
-                  Read Article 
-                  <ArrowRight size={20} className="group-hover:translate-x-1 transition" />
-                </a>
+                <div className="p-8 lg:p-12 flex flex-col justify-center">
+                  <span className="inline-block bg-emerald-600 text-white px-4 py-1 rounded-full text-sm font-medium mb-4 w-fit">
+                    {featuredArticle.category || 'Featured'}
+                  </span>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                    {featuredArticle.title}
+                  </h3>
+                  <p className="text-gray-600 mb-6 text-lg">
+                    {featuredArticle.excerpt || featuredArticle.description}
+                  </p>
+                  <div className="flex items-center text-gray-500 text-sm mb-6">
+                    <span>By {featuredArticle.author || 'Bloomie Team'}</span>
+                    <span className="mx-2">•</span>
+                    <span>{formatDate(featuredArticle.publishedAt || featuredArticle.createdAt)}</span>
+                  </div>
+                  <Link 
+                    to={`/blog/${featuredArticle.slug || featuredArticle._id}`}
+                    className="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-full font-medium hover:bg-emerald-700 transition w-fit group"
+                  >
+                    Read Article 
+                    <ArrowRight size={20} className="group-hover:translate-x-1 transition" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Recent Articles with Sidebar */}
       <section className="py-16">
@@ -131,76 +307,104 @@ export default function BloomeBlog() {
             {/* Articles List */}
             <div className="lg:col-span-2">
               <h2 className="text-3xl font-bold text-gray-900 mb-8">Recent Articles</h2>
-              <div className="space-y-8">
-                {articles.map((article) => (
-                  <div 
-                    key={article.id}
-                    className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition transform hover:-translate-y-1"
-                  >
-                    <div className="grid md:grid-cols-3">
-                      <div className="relative h-64 md:h-auto">
-                        <img 
-                          src={article.image}
-                          alt={article.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="md:col-span-2 p-6">
-                        <div className="flex gap-2 mb-3">
-                          {article.tags.map((tag, idx) => (
-                            <span 
-                              key={idx}
-                              className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium"
-                            >
-                              {tag}
-                            </span>
-                          ))}
+              {articles.length === 0 ? (
+                <p className="text-gray-600">No articles found.</p>
+              ) : (
+                <div className="space-y-8">
+                  {articles.map((article) => (
+                    <div 
+                      key={article._id || article.id}
+                      className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition transform hover:-translate-y-1"
+                    >
+                      <div className="grid md:grid-cols-3">
+                        <div className="relative h-64 md:h-auto">
+                          <img 
+                            src={getImageUrl(article.featuredImage || article.image)}
+                            alt={article.title}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
-                          {article.title}
-                        </h3>
-                        <p className="text-gray-600 mb-4">
-                          {article.excerpt}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center text-gray-500 text-sm">
-                            <span>{article.author}</span>
-                            <span className="mx-2">•</span>
-                            <span>{article.date}</span>
+                        <div className="md:col-span-2 p-6">
+                          <div className="flex gap-2 mb-3">
+                            {article.category && (
+                              <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium">
+                                {article.category}
+                              </span>
+                            )}
+                            {article.tags && article.tags.slice(0, 2).map((tag, idx) => (
+                              <span 
+                                key={idx}
+                                className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium"
+                              >
+                                {tag}
+                              </span>
+                            ))}
                           </div>
-                          <a href="#" className="text-emerald-600 font-medium hover:text-emerald-700 flex items-center gap-1 group">
-                            Read More 
-                            <ArrowRight size={16} className="group-hover:translate-x-1 transition" />
-                          </a>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            {article.title}
+                          </h3>
+                          <p className="text-gray-600 mb-4">
+                            {article.excerpt || article.description}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center text-gray-500 text-sm">
+                              <span>{article.author || 'Bloomie Team'}</span>
+                              <span className="mx-2">•</span>
+                              <span>{formatDate(article.publishedAt || article.createdAt)}</span>
+                              {article.likes > 0 && (
+                                <>
+                                  <span className="mx-2">•</span>
+                                  <span>{article.likes} likes</span>
+                                </>
+                              )}
+                            </div>
+                            <Link 
+                              to={`/blog/${article.slug || article._id}`}
+                              className="text-emerald-600 font-medium hover:text-emerald-700 flex items-center gap-1 group"
+                            >
+                              Read More 
+                              <ArrowRight size={16} className="group-hover:translate-x-1 transition" />
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Sidebar */}
             <aside className="space-y-6">
               {/* Categories */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Categories</h3>
-                <ul className="space-y-3">
-                  {categories.map((category, idx) => (
-                    <li key={idx}>
-                      <a 
-                        href="#" 
-                        className="flex items-center justify-between text-gray-600 hover:text-emerald-600 transition group"
-                      >
-                        <span className="group-hover:translate-x-1 transition">{category.name}</span>
-                        <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">
-                          {category.count}
-                        </span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {categories.length > 0 && (
+                <div className="bg-white rounded-2xl p-6 shadow-lg">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Categories</h3>
+                  <ul className="space-y-3">
+                    {categories.map((category, idx) => (
+                      <li key={idx}>
+                        <a 
+                          href="#" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleCategoryClick(category.name || category);
+                          }}
+                          className="flex items-center justify-between text-gray-600 hover:text-emerald-600 transition group"
+                        >
+                          <span className="group-hover:translate-x-1 transition">
+                            {category.name || category}
+                          </span>
+                          {category.count && (
+                            <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">
+                              {category.count}
+                            </span>
+                          )}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Subscribe Box */}
               <div className="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl p-6 shadow-lg text-white">
@@ -226,24 +430,33 @@ export default function BloomeBlog() {
                   >
                     Subscribe
                   </button>
+                  {subscribeStatus === 'success' && (
+                    <p className="text-emerald-50 text-sm text-center">Thanks for subscribing!</p>
+                  )}
                 </form>
               </div>
 
               {/* Popular Tags */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Popular Tags</h3>
-                <div className="flex flex-wrap gap-2">
-                  {popularTags.map((tag, idx) => (
-                    <a 
-                      key={idx}
-                      href="#"
-                      className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-emerald-100 hover:text-emerald-700 transition"
-                    >
-                      {tag}
-                    </a>
-                  ))}
+              {popularTags.length > 0 && (
+                <div className="bg-white rounded-2xl p-6 shadow-lg">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Popular Tags</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {popularTags.map((tag, idx) => (
+                      <a 
+                        key={idx}
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleTagClick(tag);
+                        }}
+                        className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-emerald-100 hover:text-emerald-700 transition"
+                      >
+                        {tag}
+                      </a>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </aside>
           </div>
         </div>
@@ -266,8 +479,6 @@ export default function BloomeBlog() {
           </div>
         </div>
       </section>
-
-
     </div>
   );
 }
