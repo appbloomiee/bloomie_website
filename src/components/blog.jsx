@@ -51,10 +51,33 @@ export default function BloomeBlog() {
       // Set the data
       setArticles(recentBlogs);
       setFeaturedArticle(popularBlogs[0] || null);
-      setCategories(categoriesList);
+      
+      // Calculate category counts from blogs
+      const categoryCountMap = {};
+      const allBlogs = [...recentBlogs, ...popularBlogs];
+      
+      allBlogs.forEach(blog => {
+        if (blog.category) {
+          categoryCountMap[blog.category] = (categoryCountMap[blog.category] || 0) + 1;
+        } else if (blog.categories && Array.isArray(blog.categories)) {
+          blog.categories.forEach(cat => {
+            categoryCountMap[cat] = (categoryCountMap[cat] || 0) + 1;
+          });
+        }
+      });
+      
+      // Add counts to categories
+      const categoriesWithCounts = categoriesList.map(cat => {
+        const catName = cat.name || cat;
+        return {
+          name: catName,
+          count: categoryCountMap[catName] || 0
+        };
+      });
+      
+      setCategories(categoriesWithCounts);
       
       // Extract unique tags from articles
-      const allBlogs = [...recentBlogs, ...popularBlogs];
       const allTags = allBlogs
         .filter(blog => blog && blog.tags && Array.isArray(blog.tags))
         .flatMap(blog => blog.tags)
@@ -338,7 +361,7 @@ export default function BloomeBlog() {
                           <span className="group-hover:translate-x-1 transition">
                             {category.name || category}
                           </span>
-                          {category.count && (
+                          {category.count !== undefined && category.count > 0 && (
                             <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">
                               {category.count}
                             </span>
