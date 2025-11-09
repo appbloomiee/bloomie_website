@@ -28,9 +28,9 @@ export default function BloomeBlog() {
       setLoading(true);
       setError(null);
 
-      // Fetch recent blogs
-      const recentResponse = await fetch(`${API_BASE_URL}/blogs/recent`);
-      if (!recentResponse.ok) throw new Error('Failed to fetch recent blogs');
+      // Fetch all published blogs
+      const recentResponse = await fetch(`${API_BASE_URL}/blogs/published`);
+      if (!recentResponse.ok) throw new Error('Failed to fetch published blogs');
       const recentData = await recentResponse.json();
       
       // Fetch popular blogs for featured
@@ -44,38 +44,9 @@ export default function BloomeBlog() {
       const categoriesData = await categoriesResponse.json();
 
       // Safely extract arrays from API responses
-      let recentBlogs = [];
-      if (recentData) {
-        if (Array.isArray(recentData)) {
-          recentBlogs = recentData;
-        } else if (recentData.blogs && Array.isArray(recentData.blogs)) {
-          recentBlogs = recentData.blogs;
-        } else if (recentData.data && Array.isArray(recentData.data)) {
-          recentBlogs = recentData.data;
-        }
-      }
-
-      let popularBlogs = [];
-      if (popularData) {
-        if (Array.isArray(popularData)) {
-          popularBlogs = popularData;
-        } else if (popularData.blogs && Array.isArray(popularData.blogs)) {
-          popularBlogs = popularData.blogs;
-        } else if (popularData.data && Array.isArray(popularData.data)) {
-          popularBlogs = popularData.data;
-        }
-      }
-
-      let categoriesList = [];
-      if (categoriesData) {
-        if (Array.isArray(categoriesData)) {
-          categoriesList = categoriesData;
-        } else if (categoriesData.categories && Array.isArray(categoriesData.categories)) {
-          categoriesList = categoriesData.categories;
-        } else if (categoriesData.data && Array.isArray(categoriesData.data)) {
-          categoriesList = categoriesData.data;
-        }
-      }
+      const recentBlogs = recentData?.data || recentData || [];
+      const popularBlogs = popularData?.data || popularData || [];
+      const categoriesList = categoriesData?.data || categoriesData || [];
 
       // Set the data
       setArticles(recentBlogs);
@@ -109,16 +80,7 @@ export default function BloomeBlog() {
         return response.json();
       })
       .then(data => {
-        let searchResults = [];
-        if (data) {
-          if (Array.isArray(data)) {
-            searchResults = data;
-          } else if (data.blogs && Array.isArray(data.blogs)) {
-            searchResults = data.blogs;
-          } else if (data.data && Array.isArray(data.data)) {
-            searchResults = data.data;
-          }
-        }
+        const searchResults = data?.data || data || [];
         setArticles(searchResults);
       })
       .catch(err => {
@@ -143,16 +105,7 @@ export default function BloomeBlog() {
         return response.json();
       })
       .then(data => {
-        let categoryResults = [];
-        if (data) {
-          if (Array.isArray(data)) {
-            categoryResults = data;
-          } else if (data.blogs && Array.isArray(data.blogs)) {
-            categoryResults = data.blogs;
-          } else if (data.data && Array.isArray(data.data)) {
-            categoryResults = data.data;
-          }
-        }
+        const categoryResults = data?.data || data || [];
         setArticles(categoryResults);
       })
       .catch(err => {
@@ -167,16 +120,7 @@ export default function BloomeBlog() {
         return response.json();
       })
       .then(data => {
-        let tagResults = [];
-        if (data) {
-          if (Array.isArray(data)) {
-            tagResults = data;
-          } else if (data.blogs && Array.isArray(data.blogs)) {
-            tagResults = data.blogs;
-          } else if (data.data && Array.isArray(data.data)) {
-            tagResults = data.data;
-          }
-        }
+        const tagResults = data?.data || data || [];
         setArticles(tagResults);
       })
       .catch(err => {
