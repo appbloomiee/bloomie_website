@@ -1,13 +1,15 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Menu, X, Search, ArrowRight, Mail, Loader2 } from 'lucide-react';
 
 const API_BASE_URL = 'http://107.167.94.243:5000/api';
 
 export default function BloomeBlog() {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [email, setEmail] = useState('');
+  const [visibleSections, setVisibleSections] = useState(new Set());
   
   // State for API data
   const [articles, setArticles] = useState([]);
@@ -23,40 +25,83 @@ export default function BloomeBlog() {
     fetchBlogData();
   }, []);
 
+  // Intersection Observer for fade-in animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleSections((prev) => new Set([...prev, entry.target.id]));
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    document.querySelectorAll('[data-fade]').forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [articles, featuredArticle]);
+
   const fetchBlogData = async () => {
     try {
       setLoading(true);
       setError(null);
 
+      console.log('Starting to fetch blog data...');
+
       // Fetch all published blogs
+      console.log('Fetching published blogs...');
       const recentResponse = await fetch(`${API_BASE_URL}/blogs/published`);
-      if (!recentResponse.ok) throw new Error('Failed to fetch published blogs');
+      console.log('Published blogs response status:', recentResponse.status);
+      
+      if (!recentResponse.ok) {
+        throw new Error(`Failed to fetch published blogs: ${recentResponse.status}`);
+      }
       const recentData = await recentResponse.json();
+
+      console.log('Recent data:', recentData);
       
       // Fetch popular blogs for featured
+      console.log('Fetching popular blogs...');
       const popularResponse = await fetch(`${API_BASE_URL}/blogs/popular`);
-      if (!popularResponse.ok) throw new Error('Failed to fetch popular blogs');
-      const popularData = await popularResponse.json();
+      console.log('Popular blogs response status:', popularResponse.status);
+      
+      if (!popularResponse.ok) {
+        console.warn('Failed to fetch popular blogs, continuing without featured article');
+      }
+      const popularData = popularResponse.ok ? await popularResponse.json() : { data: [] };
+      console.log('Popular data:', popularData);
       
       // Fetch categories
+      console.log('Fetching categories...');
       const categoriesResponse = await fetch(`${API_BASE_URL}/categories`);
-      if (!categoriesResponse.ok) throw new Error('Failed to fetch categories');
-      const categoriesData = await categoriesResponse.json();
+      console.log('Categories response status:', categoriesResponse.status);
+      
+      if (!categoriesResponse.ok) {
+        console.warn('Failed to fetch categories, continuing without categories');
+      }
+      const categoriesData = categoriesResponse.ok ? await categoriesResponse.json() : { data: [] };
+      console.log('Categories data:', categoriesData);
 
       // Safely extract arrays from API responses
       const recentBlogs = recentData?.data || recentData || [];
       const popularBlogs = popularData?.data || popularData || [];
       const categoriesList = categoriesData?.data || categoriesData || [];
 
+      console.log('Extracted blogs count:', recentBlogs.length);
+      console.log("first image",recentBlogs[0].images[0].url)
+      console.log('Extracted popular count:', popularBlogs.length);
+      console.log('Extracted categories count:', categoriesList.length);
+
       // Set the data
       setArticles(recentBlogs);
       setFeaturedArticle(popularBlogs[0] || null);
       
-      // Calculate category counts from blogs
+      // Calculate category counts from blogs (use only recentBlogs to avoid duplicates)
       const categoryCountMap = {};
-      const allBlogs = [...recentBlogs, ...popularBlogs];
       
-      allBlogs.forEach(blog => {
+      recentBlogs.forEach(blog => {
         if (blog.category) {
           categoryCountMap[blog.category] = (categoryCountMap[blog.category] || 0) + 1;
         } else if (blog.categories && Array.isArray(blog.categories)) {
@@ -77,13 +122,15 @@ export default function BloomeBlog() {
       
       setCategories(categoriesWithCounts);
       
-      // Extract unique tags from articles
-      const allTags = allBlogs
+      // Extract unique tags from articles (use only recentBlogs to avoid duplicates)
+      const allTags = recentBlogs
         .filter(blog => blog && blog.tags && Array.isArray(blog.tags))
         .flatMap(blog => blog.tags)
         .filter((tag, index, self) => self.indexOf(tag) === index)
         .slice(0, 6);
       setPopularTags(allTags);
+
+      console.log('Blog data fetch completed successfully');
 
     } catch (err) {
       console.error('Error fetching blog data:', err);
@@ -122,18 +169,8 @@ export default function BloomeBlog() {
   };
 
   const handleCategoryClick = (categoryName) => {
-    fetch(`${API_BASE_URL}/blogs/category/${encodeURIComponent(categoryName)}`)
-      .then(response => {
-        if (!response.ok) throw new Error('Failed to fetch category blogs');
-        return response.json();
-      })
-      .then(data => {
-        const categoryResults = data?.data || data || [];
-        setArticles(categoryResults);
-      })
-      .catch(err => {
-        console.error('Category filter error:', err);
-      });
+    console.log('Category clicked:', categoryName);
+    navigate(`/blog/category/${categoryName}`);
   };
 
   const handleTagClick = (tag) => {
@@ -159,8 +196,13 @@ export default function BloomeBlog() {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return 'https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png';
-    if (imagePath.startsWith('http')) return imagePath;
-    return `http://107.167.94.243:5000${imagePath}`;
+    return `${imagePath.url}`;
+  };
+
+  const truncateText = (text, maxLength) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
   };
 
   if (loading) {
@@ -169,6 +211,7 @@ export default function BloomeBlog() {
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-emerald-600 mx-auto mb-4" />
           <p className="text-gray-600">Loading blog posts...</p>
+          <p className="text-gray-400 text-sm mt-2">Stories and insights to help every life thrive.</p>
         </div>
       </div>
     );
@@ -193,7 +236,11 @@ export default function BloomeBlog() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-20">
+      <section 
+        id="hero"
+        data-fade
+        className={`bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-20 transition-all duration-1000 ${visibleSections.has('hero') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Bloomie Blog</h1>
           <p className="text-xl text-emerald-50 mb-8 max-w-2xl mx-auto">
@@ -226,14 +273,18 @@ export default function BloomeBlog() {
 
       {/* Featured Article */}
       {featuredArticle && (
-        <section className="py-16 bg-white">
+        <section 
+          id="featured"
+          data-fade
+          className={`py-16 bg-white transition-all duration-1000 ${visibleSections.has('featured') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+        >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Featured Article</h2>
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition">
               <div className="grid lg:grid-cols-2 gap-8">
                 <div className="relative h-64 lg:h-auto">
                   <img 
-                    src={getImageUrl(featuredArticle.featuredImage || featuredArticle.image)}
+                    src={getImageUrl(featuredArticle.featuredImage || featuredArticle.images[0])}
                     alt={featuredArticle.title}
                     className="w-full h-full object-cover"
                   />
@@ -246,7 +297,7 @@ export default function BloomeBlog() {
                     {featuredArticle.title}
                   </h3>
                   <p className="text-gray-600 mb-6 text-lg">
-                    {featuredArticle.excerpt || featuredArticle.description}
+                    {truncateText(featuredArticle.excerpt || featuredArticle.description, 200)}
                   </p>
                   <div className="flex items-center text-gray-500 text-sm mb-6">
                     <span>By {featuredArticle.author || 'Bloomie Team'}</span>
@@ -268,7 +319,11 @@ export default function BloomeBlog() {
       )}
 
       {/* Recent Articles with Sidebar */}
-      <section className="py-16">
+      <section 
+        id="articles"
+        data-fade
+        className={`py-16 transition-all duration-1000 ${visibleSections.has('articles') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Articles List */}
@@ -279,100 +334,111 @@ export default function BloomeBlog() {
               ) : (
                 <div className="space-y-8">
                   {articles.map((article) => (
-                    <div 
-                      key={article._id || article.id}
-                      className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition transform hover:-translate-y-1"
-                    >
-                      <div className="grid md:grid-cols-3">
-                        <div className="relative h-64 md:h-auto">
-                          <img 
-                            src={getImageUrl(article.featuredImage || article.image)}
-                            alt={article.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="md:col-span-2 p-6">
-                          <div className="flex gap-2 mb-3">
-                            {article.category && (
-                              <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium">
-                                {article.category}
-                              </span>
-                            )}
-                            {article.tags && article.tags.slice(0, 2).map((tag, idx) => (
-                              <span 
-                                key={idx}
-                                className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">
-                            {article.title}
-                          </h3>
-                          <p className="text-gray-600 mb-4">
-                            {article.excerpt || article.description}
-                          </p>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center text-gray-500 text-sm">
-                              <span>{article.author || 'Bloomie Team'}</span>
-                              <span className="mx-2">•</span>
-                              <span>{formatDate(article.publishedAt || article.createdAt)}</span>
-                              {article.likes > 0 && (
-                                <>
-                                  <span className="mx-2">•</span>
-                                  <span>{article.likes} likes</span>
-                                </>
-                              )}
-                            </div>
-                            <Link 
-                              to={`/blog/${article.slug || article._id}`}
-                              className="text-emerald-600 font-medium hover:text-emerald-700 flex items-center gap-1 group"
+                <div 
+                  key={article._id || article.id}
+                  className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 flex flex-col h-full"
+                >
+                  <div className="grid md:grid-cols-3 h-full">
+                    <div className="relative h-64 md:h-auto">
+                      <img 
+                        src={getImageUrl(article.featuredImage || article.images[0])}
+                        alt={article.title} 
+                        className="w-full h-full object-cover"
+                      /> 
+                    </div>
+
+                    <div className="md:col-span-2 p-6 flex flex-col justify-between">
+                      <div>
+                        <div className="flex gap-2 mb-3">
+                          {article.category && (
+                            <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium">
+                              {article.category}
+                            </span>
+                          )}
+                          {article.tags && article.tags.slice(0, 2).map((tag, idx) => (
+                            <span 
+                              key={idx}
+                              className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium"
                             >
-                              Read More 
-                              <ArrowRight size={16} className="group-hover:translate-x-1 transition" />
-                            </Link>
-                          </div>
+                              {tag}
+                            </span>
+                          ))}
                         </div>
+
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                          {article.title}
+                        </h3>
+
+                        <p className="text-gray-600 mb-4 line-clamp-3">
+                          {article.excerpt || article.description}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between text-sm text-gray-500 mt-auto">
+                        <div className="flex items-center">
+                          <span>{article.author || 'Bloomie Team'}</span>
+                          <span className="mx-2">•</span>
+                          <span>{formatDate(article.publishedAt || article.createdAt)}</span>
+                          {article.likes > 0 && (
+                            <>
+                              <span className="mx-2">•</span>
+                              <span>{article.likes} likes</span>
+                            </>
+                          )}
+                        </div>
+
+                        <Link 
+                          to={`/blog/${article.slug || article._id}`}
+                          className="text-emerald-600 font-medium hover:text-emerald-700 flex items-center gap-1 group"
+                        >
+                          Read More 
+                          <ArrowRight size={16} className="group-hover:translate-x-1 transition" />
+                        </Link>
                       </div>
                     </div>
+                  </div>
+                </div>
+
                   ))}
                 </div>
               )}
             </div>
-
+           
             {/* Sidebar */}
             <aside className="space-y-6">
               {/* Categories */}
               {categories.length > 0 && (
                 <div className="bg-white rounded-2xl p-6 shadow-lg">
                   <h3 className="text-xl font-bold text-gray-900 mb-4">Categories</h3>
-                  <ul className="space-y-3">
-                    {categories.map((category, idx) => (
-                      <li key={idx}>
-                        <a 
-                          href="#" 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleCategoryClick(category.name || category);
-                          }}
-                          className="flex items-center justify-between text-gray-600 hover:text-emerald-600 transition group"
-                        >
-                          <span className="group-hover:translate-x-1 transition">
-                            {category.name || category}
-                          </span>
-                          {category.count !== undefined && category.count > 0 && (
-                            <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">
-                              {category.count}
+                  <ul className="space-y-2">
+                    {categories.map((category, idx) => {
+                      const categoryName = category.name || category;
+                      return (
+                        <li key={idx}>
+                          <a
+                            href={`/blog/category/${categoryName}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleCategoryClick(categoryName);
+                            }}
+                            className="flex justify-between items-center p-3 rounded-lg hover:bg-emerald-50 transition-colors group"
+                          >
+                            <span className="text-gray-700 group-hover:text-emerald-700 font-medium">
+                              {categoryName}
                             </span>
-                          )}
-                        </a>
-                      </li>
-                    ))}
+                            {category.count !== undefined && category.count > 0 && (
+                              <span className="bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white px-3 py-1 rounded-full text-xs font-medium transition-colors">
+                                {category.count}
+                              </span>
+                            )}
+                          </a>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               )}
-
+              
               {/* Subscribe Box */}
               <div className="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl p-6 shadow-lg text-white">
                 <h3 className="text-xl font-bold mb-2">Stay Updated</h3>
@@ -409,17 +475,13 @@ export default function BloomeBlog() {
                   <h3 className="text-xl font-bold text-gray-900 mb-4">Popular Tags</h3>
                   <div className="flex flex-wrap gap-2">
                     {popularTags.map((tag, idx) => (
-                      <a 
+                      <button 
                         key={idx}
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleTagClick(tag);
-                        }}
+                        onClick={() => handleTagClick(tag)}
                         className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-emerald-100 hover:text-emerald-700 transition"
                       >
                         {tag}
-                      </a>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -430,7 +492,11 @@ export default function BloomeBlog() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-emerald-600 to-teal-600 py-16">
+      <section 
+        id="cta"
+        data-fade
+        className={`bg-gradient-to-r from-emerald-600 to-teal-600 py-16 transition-all duration-1000 ${visibleSections.has('cta') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">Join Our Community</h2>
           <p className="text-xl text-emerald-50 mb-8">

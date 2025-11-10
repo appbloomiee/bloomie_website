@@ -10,6 +10,24 @@ export default function BloomieContact() {
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [visibleSections, setVisibleSections] = useState(new Set());
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleSections((prev) => new Set([...prev, entry.target.id]));
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    document.querySelectorAll('[data-fade]').forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -32,7 +50,11 @@ export default function BloomieContact() {
       {/* Contact Section */}
       <main className="flex-grow py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div 
+            id="header"
+            data-fade
+            className={`text-center mb-12 transition-all duration-1000 ${visibleSections.has('header') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          >
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
               Contact <span className="text-emerald-600">Us</span>
             </h1>
@@ -41,7 +63,11 @@ export default function BloomieContact() {
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+          <div 
+            id="form"
+            data-fade
+            className={`bg-white rounded-3xl shadow-2xl p-8 md:p-12 transition-all duration-1000 ${visibleSections.has('form') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          >
             {submitted && (
               <div className="mb-6 p-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl text-emerald-800 text-center animate-pulse">
                 ✓ Thanks! Your message has been received (form simulated - no backend)
@@ -117,7 +143,11 @@ export default function BloomieContact() {
           </div>
 
           {/* Info Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mt-12">
+          <div 
+            id="info-cards"
+            data-fade
+            className={`grid md:grid-cols-3 gap-6 mt-12 transition-all duration-1000 ${visibleSections.has('info-cards') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          >
             <div className="bg-white rounded-xl p-6 shadow-md text-center hover:shadow-lg transition-shadow">
               <div className="text-4xl mb-3">📍</div>
               <h3 className="font-bold text-gray-900 mb-2">Location</h3>

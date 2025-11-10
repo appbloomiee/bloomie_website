@@ -52,12 +52,12 @@ export default function BloomieAbout() {
   ];
 
   const team = [
-    { img: "Asset/Sykat.jpg", name: "Mahmud Islam Sykat", role: "Founder & Managing Director", desc: "Visionary leader behind Bloomie's growth and innovation strategy." },
+    { img: "Asset/Sykat.png", name: "Mahmud Islam Sykat", role: "Founder & Managing Director", desc: "Visionary leader behind Bloomie's growth and innovation strategy." },
     { img: "Asset/Showmik.jpg", name: "Miskat Ul Islam", role: "Co-founder & CEO", desc: "Driving Bloomie's mission to connect nature lovers worldwide." },
     { img: "Asset/Rahat.jpg", name: "Rahat Almas", role: "Co-founder & CTO", desc: "Architect of Bloomie's intelligent technology and digital ecosystem." },
     { img: "Asset/shakil.jpg", name: "Shakil Ahmed", role: "Co-founder & CFO", desc: "Managing Bloomie's financial growth and operational excellence." },
-    { img: "Asset/Emu.PNG", name: "Ahasanul Hoque", role: "Co-founder & COO", desc: "Ensuring smooth operations and strategic development across teams." },
-    { img: "Asset/Sazzad.jpg", name: "Sabbir Ahmed Sazzad", role: "Co-founder & CPO", desc: "Overseeing product experience and creating user-centered solutions." }
+    { img: "Asset/avater.png", name: "Ahasanul Hoque", role: "Co-founder & COO", desc: "Ensuring smooth operations and strategic development across teams." },
+    { img: "Asset/avater.png", name: "Sabbir Ahmed Sazzad", role: "Co-founder & CPO", desc: "Overseeing product experience and creating user-centered solutions." }
   ];
 
   return (

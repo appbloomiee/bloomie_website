@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { Leaf } from 'lucide-react';
 
 export default function BloomieApp() {
   const [currentImage, setCurrentImage] = useState(0);
   const [imageErrors, setImageErrors] = useState({});
+  const [visibleSections, setVisibleSections] = useState(new Set());
 
   const carouselImages = [
     '/Asset/SPLASH.png',
@@ -20,6 +22,23 @@ export default function BloomieApp() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleSections((prev) => new Set([...prev, entry.target.id]));
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    document.querySelectorAll('[data-fade]').forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
   const handleImageError = (index) => {
     setImageErrors(prev => ({ ...prev, [index]: true }));
   };
@@ -27,12 +46,15 @@ export default function BloomieApp() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
   
-
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+      <section 
+        id="hero"
+        data-fade
+        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 transition-all duration-1000 ${visibleSections.has('hero') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      >
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Hero Text */}
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-6">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
               Connect with Nature,<br />
               <span className="text-emerald-600">Care for Companions</span> 🌸
@@ -102,7 +124,11 @@ export default function BloomieApp() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-white py-16 lg:py-24">
+      <section 
+        id="features"
+        data-fade
+        className={`bg-white py-16 lg:py-24 transition-all duration-1000 ${visibleSections.has('features') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">

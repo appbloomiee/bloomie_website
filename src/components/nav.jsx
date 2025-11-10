@@ -18,11 +18,11 @@ const Nav = () => {
       : 'block text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 transition px-4 py-3 rounded-lg';
 
   return (
-    <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+    <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-[100]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <a href="#" className="flex items-center space-x-2 font-bold text-xl text-emerald-700">
+          <NavLink to="/" className="flex items-center space-x-2 font-bold text-xl text-emerald-700">
             <div className="w-8 h-8 flex items-center justify-center">
               <img 
                 src="/Asset/logo.svg" 
@@ -36,7 +36,7 @@ const Nav = () => {
               <Leaf className="w-8 h-8 text-emerald-600 hidden" />
             </div>
             <span>Bloomie AI</span>
-          </a>
+          </NavLink>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-4">
@@ -55,7 +55,8 @@ const Nav = () => {
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-gray-700"
+            className="md:hidden text-gray-700 z-50 relative"
+            aria-label="Toggle menu"
           >
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -63,7 +64,7 @@ const Nav = () => {
 
         {/* Mobile Navigation - List View */}
         {menuOpen && (
-          <nav className="md:hidden py-4 space-y-2 border-t">
+          <nav className="md:hidden py-4 space-y-2 border-t bg-white relative z-50">
             <NavLink 
               to="/" 
               className={mobileNavLinkClass} 
