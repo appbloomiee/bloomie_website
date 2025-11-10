@@ -151,8 +151,9 @@ export default function BlogDetail() {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return 'https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png';
-    if (imagePath.startsWith('http')) return imagePath;
-    return `http://107.167.94.243:5000${imagePath}`;
+    if (typeof imagePath === 'string') return imagePath;
+    if (imagePath.url) return imagePath.url;
+    return 'https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png';
   };
 
   const handleLike = () => {
@@ -284,13 +285,13 @@ export default function BlogDetail() {
             </button>
           </div>
 
-          {/* Featured Image */}
-          {(article.featuredImage || article.image) && (
+          {/* Featured Image - FIXED */}
+          {(article.featuredImage || article.image || (article.images && article.images[0])) && (
             <div className="mb-12 rounded-3xl overflow-hidden shadow-2xl">
               <img 
-                src={getImageUrl(article.featuredImage || article.image)}
+                src={getImageUrl(article.featuredImage || article.image || (article.images && article.images[0]))}
                 alt={article.title}
-                className="w-full h-auto object-cover"
+                className="w-full h-96 object-cover"
               />
             </div>
           )}
@@ -327,7 +328,7 @@ export default function BlogDetail() {
                 >
                   <div className="relative h-48">
                     <img 
-                      src={getImageUrl(related.featuredImage || related.image)}
+                      src={getImageUrl(related.featuredImage || related.image || (related.images && related.images[0]))}
                       alt={related.title}
                       className="w-full h-full object-cover"
                     />

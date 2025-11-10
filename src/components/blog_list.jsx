@@ -69,8 +69,9 @@ export default function BlogList() {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return 'https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png';
-    if (imagePath.startsWith('http')) return imagePath;
-    return `http://107.167.94.243:5000${imagePath}`;
+    if (typeof imagePath === 'string') return imagePath;
+    if (imagePath.url) return imagePath.url;
+    return 'https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png';
   };
 
   const navigateToDetail = (slug) => {
@@ -150,9 +151,9 @@ export default function BlogList() {
                   className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 opacity-0 animate-fade-in"
                   style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
                 >
-                  <div className="relative h-48">
+                  <div className="relative h-48 overflow-hidden">
                     <img 
-                      src={getImageUrl(article.featuredImage || article.image)}
+                      src={getImageUrl(article.featuredImage || (article.images && article.images[0]))}
                       alt={article.title}
                       className="w-full h-full object-cover"
                     />

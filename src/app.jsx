@@ -11,6 +11,7 @@ import Features from './components/feature'
 import Nav from './components/nav'
 import Footer from './components/footer'
 import ChatWidget from './components/chat_widget'
+import ErrorBoundary from './components/error_boundary'
 
 function ScrollToTop() {
   const { pathname } = useLocation();

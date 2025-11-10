@@ -1,10 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Menu, X, Search, ArrowRight, Mail, Loader2 } from 'lucide-react';
+import ErrorBoundary from './error_boundary';
 
 const API_BASE_URL = 'http://107.167.94.243:5000/api';
 
-export default function BloomeBlog() {
+function BloomeBlog() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,7 +91,9 @@ export default function BloomeBlog() {
       const categoriesList = categoriesData?.data || categoriesData || [];
 
       console.log('Extracted blogs count:', recentBlogs.length);
-      console.log("first image",recentBlogs[0].images[0].url)
+      if (recentBlogs.length > 0 && recentBlogs[0].images?.[0]?.url) {
+        console.log("first image", recentBlogs[0].images[0].url);
+      }
       console.log('Extracted popular count:', popularBlogs.length);
       console.log('Extracted categories count:', categoriesList.length);
 
@@ -196,7 +199,9 @@ export default function BloomeBlog() {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return 'https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png';
-    return `${imagePath.url}`;
+    if (typeof imagePath === 'string') return imagePath;
+    if (imagePath.url) return imagePath.url;
+    return 'https://static.wixstatic.com/media/a89370_d321251931714fa3badfa6156c2c02ea~mv2.png';
   };
 
   const truncateText = (text, maxLength) => {
@@ -282,11 +287,11 @@ export default function BloomeBlog() {
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Featured Article</h2>
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition">
               <div className="grid lg:grid-cols-2 gap-8">
-                <div className="relative h-64 lg:h-auto">
+                <div className="relative h-80 lg:h-96 overflow-hidden bg-gray-100 flex items-center justify-center">
                   <img 
-                    src={getImageUrl(featuredArticle.featuredImage || featuredArticle.images[0])}
+                    src={getImageUrl(featuredArticle.featuredImage || (featuredArticle.images && featuredArticle.images[0]))}
                     alt={featuredArticle.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div className="p-8 lg:p-12 flex flex-col justify-center">
@@ -330,75 +335,98 @@ export default function BloomeBlog() {
             <div className="lg:col-span-2">
               <h2 className="text-3xl font-bold text-gray-900 mb-8">Recent Articles</h2>
               {articles.length === 0 ? (
-                <p className="text-gray-600">No articles found.</p>
+                <div className="bg-white rounded-2xl p-12 text-center shadow-lg">
+                  <div className="max-w-md mx-auto">
+                    <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Search className="w-10 h-10 text-emerald-600" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">No Articles Found</h3>
+                    <p className="text-gray-600 mb-6">
+                      {searchQuery ? 
+                        `We couldn't find any articles matching "${searchQuery}". Try different keywords.` :
+                        "There are no published articles at the moment. Check back soon for new content!"
+                      }
+                    </p>
+                    {searchQuery && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          fetchBlogData();
+                        }}
+                        className="bg-emerald-600 text-white px-6 py-2 rounded-full hover:bg-emerald-700 transition"
+                      >
+                        Clear Search
+                      </button>
+                    )}
+                  </div>
+                </div>
               ) : (
                 <div className="space-y-8">
                   {articles.map((article) => (
-                <div 
-                  key={article._id || article.id}
-                  className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 flex flex-col h-full"
-                >
-                  <div className="grid md:grid-cols-3 h-full">
-                    <div className="relative h-64 md:h-auto">
-                      <img 
-                        src={getImageUrl(article.featuredImage || article.images[0])}
-                        alt={article.title} 
-                        className="w-full h-full object-cover"
-                      /> 
-                    </div>
-
-                    <div className="md:col-span-2 p-6 flex flex-col justify-between">
-                      <div>
-                        <div className="flex gap-2 mb-3">
-                          {article.category && (
-                            <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium">
-                              {article.category}
-                            </span>
-                          )}
-                          {article.tags && article.tags.slice(0, 2).map((tag, idx) => (
-                            <span 
-                              key={idx}
-                              className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium"
-                            >
-                              {tag}
-                            </span>
-                          ))}
+                    <div 
+                      key={article._id || article.id}
+                      className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition transform hover:-translate-y-1"
+                    >
+                      <div className="grid md:grid-cols-3">
+                        <div className="relative h-64 md:h-64 overflow-hidden bg-gray-100 flex items-center justify-center">
+                          <img 
+                            src={getImageUrl(article.featuredImage || (article.images && article.images[0]))}
+                            alt={article.title} 
+                            className="w-full h-full object-contain"
+                          /> 
                         </div>
 
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
-                          {article.title}
-                        </h3>
+                        <div className="md:col-span-2 p-6 flex flex-col justify-between min-h-[16rem]">
+                          <div>
+                            <div className="flex gap-2 mb-3">
+                              {article.category && (
+                                <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium">
+                                  {article.category}
+                                </span>
+                              )}
+                              {article.tags && article.tags.slice(0, 2).map((tag, idx) => (
+                                <span 
+                                  key={idx}
+                                  className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
 
-                        <p className="text-gray-600 mb-4 line-clamp-3">
-                          {article.excerpt || article.description}
-                        </p>
-                      </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">
+                              {article.title}
+                            </h3>
 
-                      <div className="flex items-center justify-between text-sm text-gray-500 mt-auto">
-                        <div className="flex items-center">
-                          <span>{article.author || 'Bloomie Team'}</span>
-                          <span className="mx-2">•</span>
-                          <span>{formatDate(article.publishedAt || article.createdAt)}</span>
-                          {article.likes > 0 && (
-                            <>
+                            <p className="text-gray-600 mb-4 line-clamp-3">
+                              {article.excerpt || article.description}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between text-sm text-gray-500 mt-auto">
+                            <div className="flex items-center">
+                              <span>{article.author || 'Bloomie Team'}</span>
                               <span className="mx-2">•</span>
-                              <span>{article.likes} likes</span>
-                            </>
-                          )}
-                        </div>
+                              <span>{formatDate(article.publishedAt || article.createdAt)}</span>
+                              {article.likes > 0 && (
+                                <>
+                                  <span className="mx-2">•</span>
+                                  <span>{article.likes} likes</span>
+                                </>
+                              )}
+                            </div>
 
-                        <Link 
-                          to={`/blog/${article.slug || article._id}`}
-                          className="text-emerald-600 font-medium hover:text-emerald-700 flex items-center gap-1 group"
-                        >
-                          Read More 
-                          <ArrowRight size={16} className="group-hover:translate-x-1 transition" />
-                        </Link>
+                            <Link 
+                              to={`/blog/${article.slug || article._id}`}
+                              className="text-emerald-600 font-medium hover:text-emerald-700 flex items-center gap-1 group"
+                            >
+                              Read More 
+                              <ArrowRight size={16} className="group-hover:translate-x-1 transition" />
+                            </Link>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-
                   ))}
                 </div>
               )}
@@ -513,5 +541,14 @@ export default function BloomeBlog() {
         </div>
       </section>
     </div>
+  );
+}
+
+// Export wrapped with ErrorBoundary
+export default function BlogWithErrorBoundary() {
+  return (
+    <ErrorBoundary>
+      <BloomeBlog />
+    </ErrorBoundary>
   );
 }
