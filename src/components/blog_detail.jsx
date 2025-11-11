@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Calendar, User, Heart, Share2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Heart, Share2, Loader2, Clock, Tag } from 'lucide-react';
 
 const API_BASE_URL = 'http://107.167.94.243:5000/api';
 
@@ -52,7 +52,6 @@ export default function BlogDetail() {
             else if (data.blogs && Array.isArray(data.blogs)) allBlogs = data.blogs;
             else if (data.data && Array.isArray(data.data)) allBlogs = data.data;
 
-            // Find the blog that matches the slug or _id
             articleData = allBlogs.find(blog => 
               blog.slug === slug || 
               blog._id === slug || 
@@ -113,7 +112,6 @@ export default function BlogDetail() {
             } else if (relatedData.data && Array.isArray(relatedData.data)) {
               relatedList = relatedData.data;
             }
-            // Filter out current article and limit to 3
             setRelatedArticles(
               relatedList
                 .filter(a => {
@@ -175,10 +173,10 @@ export default function BlogDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center pt-20">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-teal-50/30 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-emerald-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading article...</p>
+          <p className="text-gray-600 font-medium">Loading article...</p>
         </div>
       </div>
     );
@@ -186,17 +184,17 @@ export default function BlogDetail() {
 
   if (error || !article) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center pt-20">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <div className="text-red-600 text-5xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Article Not Found</h2>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-teal-50/30 flex items-center justify-center p-4">
+        <div className="text-center max-w-md mx-auto">
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 border border-gray-100">
+            <div className="text-6xl mb-4">📝</div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Article Not Found</h2>
             <p className="text-gray-600 mb-6">
               {error || 'Sorry, we couldn\'t find the article you\'re looking for.'}
             </p>
             <button 
               onClick={() => navigate('/blog')}
-              className="bg-emerald-600 text-white px-6 py-3 rounded-full hover:bg-emerald-700 transition transform hover:scale-105"
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-8 py-3 rounded-full hover:shadow-lg transition transform hover:scale-105 font-medium"
             >
               Back to Blog
             </button>
@@ -207,100 +205,157 @@ export default function BlogDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 pt-20">
-      {/* Back Button */}
-      <div className="bg-white border-b sticky top-16 z-10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link 
-            to="/blog"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-emerald-600 transition group"
-          >
-            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition" />
-            Back to Blog
-          </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-teal-50/30">
+      {/* Compact Header Bar */}
+      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between">
+            <Link 
+              to="/blog"
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-emerald-600 transition group"
+            >
+              <ArrowLeft size={18} className="group-hover:-translate-x-1 transition" />
+              <span className="font-medium text-sm">Back</span>
+            </Link>
+            
+            <div className="flex gap-2">
+              <button 
+                onClick={handleLike}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                  liked 
+                    ? 'bg-red-100 text-red-600' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Heart size={16} fill={liked ? 'currentColor' : 'none'} />
+                <span>{(article.likes || 0) + (liked ? 1 : 0)}</span>
+              </button>
+              <button 
+                onClick={handleShare}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition text-sm font-medium"
+              >
+                <Share2 size={16} />
+                <span className="hidden sm:inline">Share</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Article Header */}
+      {/* Hero Section with Image */}
+      <div className="relative">
+        {(article.featuredImage || article.image || (article.images && article.images[0])) && (
+          <div className="relative h-[60vh] max-h-[600px] overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+            <img 
+              src={getImageUrl(article.featuredImage || article.image || (article.images && article.images[0]))}
+              alt={article.title}
+              className="w-full h-full object-cover"
+            />
+            
+            {/* Title Overlay */}
+            <div className="absolute bottom-0 left-0 right-0 z-20 p-8">
+              <div className="max-w-5xl mx-auto">
+                {/* Category Badge */}
+                {article.category && (
+                  <div className="mb-4">
+                    <span className="inline-block bg-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+                      {article.category}
+                    </span>
+                  </div>
+                )}
+                
+                {/* Title */}
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+                  {article.title}
+                </h1>
+                
+                {/* Meta Info */}
+                <div className="flex flex-wrap items-center gap-4 text-white/90 text-sm">
+                  <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full">
+                    <User size={16} />
+                    <span className="font-medium">{article.author || 'Bloomie Team'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full">
+                    <Calendar size={16} />
+                    <span>{formatDate(article.publishedAt || article.createdAt)}</span>
+                  </div>
+                  {article.readTime && (
+                    <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full">
+                      <Clock size={16} />
+                      <span>{article.readTime} min read</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* No Image Fallback */}
+        {!(article.featuredImage || article.image || (article.images && article.images[0])) && (
+          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 py-16 px-8">
+            <div className="max-w-5xl mx-auto">
+              {article.category && (
+                <span className="inline-block bg-white/20 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-sm font-semibold mb-4">
+                  {article.category}
+                </span>
+              )}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+                {article.title}
+              </h1>
+              <div className="flex flex-wrap items-center gap-4 text-white/90 text-sm">
+                <div className="flex items-center gap-2">
+                  <User size={16} />
+                  <span>{article.author || 'Bloomie Team'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar size={16} />
+                  <span>{formatDate(article.publishedAt || article.createdAt)}</span>
+                </div>
+                {article.readTime && (
+                  <div className="flex items-center gap-2">
+                    <Clock size={16} />
+                    <span>{article.readTime} min read</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Article Content */}
       <article className="py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Category & Tags */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {article.category && (
-              <span className="bg-emerald-600 text-white px-4 py-1 rounded-full text-sm font-medium">
-                {article.category}
-              </span>
-            )}
-            {article.tags && Array.isArray(article.tags) && article.tags.map((tag, idx) => (
-              <span 
-                key={idx}
-                className="bg-white text-gray-700 px-3 py-1 rounded-full text-sm font-medium shadow-sm"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-
-          {/* Title */}
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            {article.title}
-          </h1>
-
-          {/* Meta Info */}
-          <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-8">
-            <div className="flex items-center gap-2">
-              <User size={18} />
-              <span>{article.author || 'Bloomie Team'}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar size={18} />
-              <span>{formatDate(article.publishedAt || article.createdAt)}</span>
-            </div>
-            {article.readTime && (
-              <div className="flex items-center gap-2">
-                <span>{article.readTime} min read</span>
-              </div>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-4 mb-8">
-            <button 
-              onClick={handleLike}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full transition ${
-                liked 
-                  ? 'bg-red-100 text-red-600' 
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
-              } shadow-sm`}
-            >
-              <Heart size={20} fill={liked ? 'currentColor' : 'none'} />
-              <span>{(article.likes || 0) + (liked ? 1 : 0)}</span>
-            </button>
-            <button 
-              onClick={handleShare}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-600 hover:bg-gray-50 transition shadow-sm"
-            >
-              <Share2 size={20} />
-              Share
-            </button>
-          </div>
-
-          {/* Featured Image - FIXED */}
-          {(article.featuredImage || article.image || (article.images && article.images[0])) && (
-            <div className="mb-12 rounded-3xl overflow-hidden shadow-2xl">
-              <img 
-                src={getImageUrl(article.featuredImage || article.image || (article.images && article.images[0]))}
-                alt={article.title}
-                className="w-full h-96 object-cover"
-              />
+          
+          {/* Tags */}
+          {article.tags && Array.isArray(article.tags) && article.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-8">
+              {article.tags.map((tag, idx) => (
+                <span 
+                  key={idx}
+                  className="inline-flex items-center gap-1 bg-white text-gray-700 px-3 py-1 rounded-full text-sm font-medium shadow-sm border border-gray-200"
+                >
+                  <Tag size={12} />
+                  {tag}
+                </span>
+              ))}
             </div>
           )}
 
-          {/* Article Content */}
-          <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-12">
+          {/* Content Card */}
+          <div className="bg-white rounded-3xl shadow-lg p-8 sm:p-12 border border-gray-100">
             {article.content ? (
               <div 
-                className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-emerald-600 prose-strong:text-gray-900 prose-li:text-gray-700"
+                className="prose prose-lg max-w-none 
+                  prose-headings:text-gray-900 prose-headings:font-bold
+                  prose-p:text-gray-700 prose-p:leading-relaxed
+                  prose-a:text-emerald-600 prose-a:no-underline hover:prose-a:underline
+                  prose-strong:text-gray-900 prose-strong:font-semibold
+                  prose-li:text-gray-700
+                  prose-img:rounded-2xl prose-img:shadow-md
+                  prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-50/50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg"
                 dangerouslySetInnerHTML={{ __html: article.content }}
               />
             ) : (
@@ -316,33 +371,33 @@ export default function BlogDetail() {
 
       {/* Related Articles */}
       {relatedArticles.length > 0 && (
-        <section className="py-16 bg-white">
+        <section className="py-16 bg-gradient-to-b from-transparent to-emerald-50/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">Related Articles</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">You May Also Like</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {relatedArticles.map((related) => (
                 <Link
                   key={related._id || related.id}
                   to={`/blog/${related.slug || related._id || related.id}`}
-                  className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition transform hover:-translate-y-1"
+                  className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100"
                 >
-                  <div className="relative h-48">
+                  <div className="relative h-48 overflow-hidden">
                     <img 
                       src={getImageUrl(related.featuredImage || related.image || (related.images && related.images[0]))}
                       alt={related.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
-                  </div>
-                  <div className="p-6">
                     {related.category && (
-                      <span className="inline-block bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-medium mb-3">
+                      <span className="absolute top-3 left-3 bg-white text-emerald-600 px-3 py-1 rounded-full text-xs font-semibold shadow-md">
                         {related.category}
                       </span>
                     )}
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-emerald-600 transition">
                       {related.title}
                     </h3>
-                    <p className="text-gray-600 text-sm line-clamp-3">
+                    <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">
                       {related.excerpt || related.description}
                     </p>
                   </div>
@@ -354,17 +409,26 @@ export default function BlogDetail() {
       )}
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-emerald-600 to-teal-600 py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Enjoyed this article?</h2>
-          <p className="text-xl text-emerald-50 mb-8">
-            Download Bloomie to get personalized care tips and connect with our community.
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600"></div>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }}></div>
+        </div>
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            Love What You're Reading?
+          </h2>
+          <p className="text-xl text-emerald-50 mb-8 max-w-2xl mx-auto">
+            Get personalized care tips and join our thriving plant community with Bloomie.
           </p>
           <a 
             href="#" 
-            className="inline-block bg-white text-emerald-600 px-8 py-3 rounded-full font-medium hover:bg-emerald-50 transition transform hover:scale-105 shadow-lg"
+            className="inline-block bg-white text-emerald-600 px-8 py-4 rounded-full font-semibold hover:bg-emerald-50 transition transform hover:scale-105 shadow-xl"
           >
-            Download Bloomie
+            Download Bloomie Now
           </a>
         </div>
       </section>

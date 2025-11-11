@@ -195,7 +195,7 @@ export default function BloomieAbout() {
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Meet Our Team</h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                The passionate individuals behind Bloomie, united by love for plants, pets, 
+                The passionate individuals behind Bloomie AI, united by love for plants, pets, 
                 and the people who care for them.
               </p>
             </div>
