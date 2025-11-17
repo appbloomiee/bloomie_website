@@ -22,15 +22,25 @@ export default function BlogDetail() {
       setLoading(true);
       setError(null);
       try {
-        console.log('Fetching blog with slug:', slug);
+        console.log('Fetching blog with identifier:', slug);
         
-        const res = await fetch(`${API_BASE_URL}/blogs/slug/${slug}`);
+        let res;
+        let data;
+        
+        // First, try to fetch by slug
+        res = await fetch(`${API_BASE_URL}/blogs/slug/${slug}`);
+        
+        // If slug fetch fails with 404, try fetching by ID
+        if (!res.ok && res.status === 404) {
+          console.log('Slug not found, trying to fetch by ID...');
+          res = await fetch(`${API_BASE_URL}/blogs/${slug}`);
+        }
         
         if (!res.ok) {
           throw new Error(`Article not found (${res.status})`);
         }
         
-        const data = await res.json();
+        data = await res.json();
         console.log('Blog data received:', data);
         
         const blog = data.blog || data.data || data;

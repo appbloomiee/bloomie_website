@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 const API_BASE_URL = 'http://107.167.94.243:5000/api';
 
-export default function BlogCategories({ categories, onCategoryClick }) {
+export default function BlogCategories({ categories, onCategoryClick, refreshTrigger }) {
   const [categoriesWithCounts, setCategoriesWithCounts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,14 +11,14 @@ export default function BlogCategories({ categories, onCategoryClick }) {
     if (categories && categories.length > 0) {
       calculateCategoryCounts();
     }
-  }, [categories]);
+  }, [categories, refreshTrigger]); // Added refreshTrigger dependency
 
   const calculateCategoryCounts = async () => {
     try {
       setLoading(true);
       
-      // Fetch all blogs
-      const response = await fetch(`${API_BASE_URL}/blogs`);
+      // Fetch all blogs with cache-busting
+      const response = await fetch(`${API_BASE_URL}/blogs?t=${Date.now()}`);
       if (!response.ok) throw new Error('Failed to fetch blogs');
       
       const data = await response.json();
@@ -27,10 +27,17 @@ export default function BlogCategories({ categories, onCategoryClick }) {
       console.log('Total blogs fetched:', blogs.length);
       console.log('Sample blog:', blogs[0]);
       
+      // Filter only published blogs
+      const publishedBlogs = blogs.filter(blog => 
+        blog.status === 'published' || blog.status === 'Published'
+      );
+      
+      console.log('Published blogs:', publishedBlogs.length);
+      
       // Count categories
       const categoryCountMap = {};
       
-      blogs.forEach(blog => {
+      publishedBlogs.forEach(blog => {
         // Try different possible category field names
         const categoryField = blog.category || blog.categories || blog.Category;
         

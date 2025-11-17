@@ -1,9 +1,8 @@
 // src/components/pages/BloomieBlog/SearchResults.jsx
 import React, { useState, useEffect } from 'react';
 import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
-import ArticlesList from './ArticlesList';
+import ArticleCard from './ArticleCard';
 import { searchBlogs } from './api';
-//import BlogFilter from '../../BlogFilter';
 
 export default function SearchResults() {
   const location = useLocation();
@@ -23,7 +22,7 @@ export default function SearchResults() {
         try {
           setLoading(true);
           setError(null);
-          console.log('Fetching search results for:', query); // Debug log
+          console.log('Fetching search results for:', query);
           const data = await searchBlogs(query);
           setResults(data?.data || data || []);
         } catch (err) {
@@ -101,7 +100,11 @@ export default function SearchResults() {
         )}
 
         {results.length > 0 ? (
-          <ArticlesList articles={results} />
+          <div className="space-y-8">
+            {results.map((article) => (
+              <ArticleCard key={article._id || article.id} article={article} />
+            ))}
+          </div>
         ) : (
           <div className="text-center py-12">
             <svg

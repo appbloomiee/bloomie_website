@@ -28,7 +28,7 @@ export default function FeaturedArticle() {
       console.log("Popular Blog API:", data);
 
       if (data.success && Array.isArray(data.data)) {
-        setArticle(data.data[0]); // 👈 ALWAYS take the first blog
+        setArticle(data.data[0]);
       } else {
         throw new Error("Invalid blog response");
       }
@@ -75,20 +75,19 @@ export default function FeaturedArticle() {
   if (!article) return null;
 
   return (
-    <section className="py-16 bg-white opacity-100 translate-y-0"> 
-      {/* 👆 ALWAYS visible, fade removed */}
-
+    <section className="py-16 bg-white opacity-100 translate-y-0">
       <div className="max-w-7xl mx-auto px-4">
         <h2 className="text-3xl font-bold mb-8">Featured Article</h2>
 
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition">
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-0">
 
-            <div className="relative h-80 lg:h-96 overflow-hidden bg-gray-100 flex items-center justify-center">
+            {/* Image like recent articles on mobile - taller on desktop */}
+            <div className="relative w-full h-48 lg:h-80 overflow-hidden bg-gray-100">
               <img
                 src={getImageUrl(article.featuredImage || article.images?.[0])}
                 alt={article.title}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover"
                 onError={(e) => (e.target.src = 'https://via.placeholder.com/800x600?text=No+Image')}
               />
             </div>
@@ -102,8 +101,8 @@ export default function FeaturedArticle() {
                 {article.title}
               </h3>
 
-              <p className="text-gray-600 mb-6 text-lg">
-                {truncateText(article.excerpt || article.description, 200)}
+              <p className="text-gray-600 mb-6 text-base lg:text-lg line-clamp-2">
+                {article.excerpt || article.description}
               </p>
 
               <div className="flex items-center text-gray-500 text-sm mb-6">
