@@ -1,6 +1,6 @@
 // useBlogData.js
 import { useState, useEffect } from 'react';
-import { fetchPublishedBlogs, fetchPopularBlogs, fetchCategories } from './api';
+import { fetchRecentBlogs, fetchPopularBlogs, fetchCategories } from './api';
 
 export function useBlogData() {
   const [articles, setArticles] = useState([]);
@@ -19,7 +19,7 @@ export function useBlogData() {
 
       // Fetch all data in parallel
       const [recentData, popularData, categoriesData] = await Promise.all([
-        fetchPublishedBlogs(),
+        fetchRecentBlogs(),
         fetchPopularBlogs(),
         fetchCategories()
       ]);

@@ -1,4 +1,3 @@
-// api.js
 import { API_BASE_URL } from './constants';
 
 export const fetchPublishedBlogs = async () => {
@@ -13,6 +12,15 @@ export const fetchPopularBlogs = async () => {
   const response = await fetch(`${API_BASE_URL}/blogs/popular`);
   if (!response.ok) {
     console.warn('Failed to fetch popular blogs');
+    return { data: [] };
+  }
+  return response.json();
+};
+
+export const fetchRecentBlogs = async (limit = 3) => {
+  const response = await fetch(`${API_BASE_URL}/blogs/recent?limit=${limit}`);
+  if (!response.ok) {
+    console.warn('Failed to fetch recent blogs');
     return { data: [] };
   }
   return response.json();

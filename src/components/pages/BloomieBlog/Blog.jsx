@@ -15,15 +15,15 @@ import CTASection from './CTASection';
 import LoadingScreen from './LoadingScreen';
 import ErrorScreen from './ErrorScreen';
 
+
+// API functions
+import { fetchBlogsByTag } from './api';
+
 // Error boundary
 import ErrorBoundary from '../../error_boundary';
 
-// Optional: BlogContent if needed
-// import BlogContent from '../BlogDetails/BlogContent'; 
-
 function Blog() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
   const [email, setEmail] = useState('');
   const [subscribeStatus, setSubscribeStatus] = useState('');
 
@@ -41,19 +41,6 @@ function Blog() {
   const visibleSections = useFadeAnimation([articles, featuredArticle]);
 
   // Handlers
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-
-    // Example search function
-    searchBlogs(searchQuery)
-      .then((data) => {
-        const searchResults = data?.data || data || [];
-        setArticles(searchResults);
-      })
-      .catch((err) => console.error('Search error:', err));
-  };
-
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (!email.trim()) return;
@@ -66,18 +53,14 @@ function Blog() {
     navigate(`/blog/category/${categoryName}`);
   };
 
-  const handleTagClick = (tag) => {
-    fetchBlogsByTag(tag)
-      .then((data) => {
-        const tagResults = data?.data || data || [];
-        setArticles(tagResults);
-      })
-      .catch((err) => console.error('Tag filter error:', err));
-  };
-
-  const handleClearSearch = () => {
-    setSearchQuery('');
-    refetch();
+  const handleTagClick = async (tag) => {
+    try {
+      const data = await fetchBlogsByTag(tag);
+      const tagResults = data?.data || data || [];
+      setArticles(tagResults);
+    } catch (err) {
+      console.error('Tag filter error:', err);
+    }
   };
 
   // Loading/Error screens
@@ -86,12 +69,8 @@ function Blog() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-      <HeroSection
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        handleSearch={handleSearch}
-        visibleSections={visibleSections}
-      />
+      {/* Hero with integrated search bar */}
+      <HeroSection visibleSections={visibleSections} />
 
       <FeaturedArticle article={featuredArticle} visibleSections={visibleSections} />
 
@@ -106,11 +85,7 @@ function Blog() {
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <h2 className="text-3xl font-bold text-gray-900 mb-8">Recent Articles</h2>
-              <ArticlesList
-                articles={articles}
-                searchQuery={searchQuery}
-                onClearSearch={handleClearSearch}
-              />
+              <ArticlesList articles={articles} />
             </div>
 
             <BlogSidebar

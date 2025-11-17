@@ -10,6 +10,7 @@ import BlogList from './components/pages/BlogList/BlogList.jsx';
 import BlogDetail from './components/pages/BlogDetails/BlogDetail';
 import Contact from './components/pages/Contact/Contact.jsx';
 import Features from './components/pages/Features/Features.jsx';
+import SearchResults from './components/pages/BloomieBlog/SearchResult.jsx';
 
 // Layout components
 import Nav from './components/nav';
@@ -43,12 +44,19 @@ function App() {
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} /> {/* ✅ Works now */}
+            <Route path="/about" element={<About />} />
             <Route path="/feature" element={<Features />} />
             <Route path="/blog" element={<Blog />} />
+            
+            {/* ✅ CRITICAL: /blog/search MUST come BEFORE /blog/:slug */}
+            <Route path="/blog/search" element={<SearchResults />} />
             <Route path="/blog/category/:category" element={<BlogList />} />
+            
+            {/* ✅ Dynamic route comes LAST */}
             <Route path="/blog/:slug" element={<BlogDetail />} />
+            
             <Route path="/contact" element={<Contact />} />
+            
             {/* 404 Fallback */}
             <Route
               path="*"

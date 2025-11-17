@@ -1,5 +1,6 @@
 // BlogSidebar.jsx
 import { Mail } from 'lucide-react';
+import BlogCategories from './BlogCategories';
 
 export default function BlogSidebar({ 
   categories, 
@@ -14,37 +15,10 @@ export default function BlogSidebar({
   return (
     <aside className="space-y-6">
       {/* Categories */}
-      {categories.length > 0 && (
-        <div className="bg-white rounded-2xl p-6 shadow-lg">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">Categories</h3>
-          <ul className="space-y-2">
-            {categories.map((category, idx) => {
-              const categoryName = category.name || category;
-              return (
-                <li key={idx}>
-                  <a
-                    href={`/blog/category/${categoryName}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      onCategoryClick(categoryName);
-                    }}
-                    className="flex justify-between items-center p-3 rounded-lg hover:bg-emerald-50 transition-colors group"
-                  >
-                    <span className="text-gray-700 group-hover:text-emerald-700 font-medium">
-                      {categoryName}
-                    </span>
-                    {category.count !== undefined && category.count > 0 && (
-                      <span className="bg-emerald-100 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white px-3 py-1 rounded-full text-xs font-medium transition-colors">
-                        {category.count}
-                      </span>
-                    )}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
+      <BlogCategories 
+        categories={categories} 
+        onCategoryClick={onCategoryClick} 
+      />
       
       {/* Subscribe Box */}
       <div className="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl p-6 shadow-lg text-white">
