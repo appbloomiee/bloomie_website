@@ -11,6 +11,8 @@ import BlogDetail from './components/pages/BlogDetails/BlogDetail';
 import Contact from './components/pages/Contact/Contact.jsx';
 import Features from './components/pages/Features/Features.jsx';
 import SearchResults from './components/pages/BloomieBlog/SearchResult.jsx';
+import PrivacyPolicy from './components/Privecy&Policy';
+import TermsConditions from './components/Terms&Conditions';
 
 // Layout components
 import Nav from './components/nav';
@@ -56,6 +58,10 @@ function App() {
             <Route path="/blog/:slug" element={<BlogDetail />} />
             
             <Route path="/contact" element={<Contact />} />
+            
+            {/* Privacy Policy and Terms & Conditions */}
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-conditions" element={<TermsConditions />} />
             
             {/* 404 Fallback */}
             <Route
